@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Perasmian Hospital Baling</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,600&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CSS SAMA SEPERTI SEBELUMNYA --- */
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Montserrat', sans-serif; overflow: hidden; background: radial-gradient(circle at center, #002d5a 0%, #000812 100%); color: #fff; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        #login-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 2s ease; }
+        .grid-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-image: linear-gradient(rgba(0, 234, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 234, 255, 0.05) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; }
+        canvas#ecg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.7; }
+        .medical-hud { position: absolute; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; color: #80d4ff; z-index: 2; letter-spacing: 1px; text-transform: uppercase; }
+        .top-left { top: 40px; left: 40px; border-left: 3px solid #00eaff; padding-left: 15px; }
+        .top-left h4 { margin: 0; color: #00eaff; font-size: 1.2rem; margin-bottom: 5px; font-weight: 800; }
+        .bp-reading { font-size: 1.1rem; color: #fff; font-weight: 600; letter-spacing: 1px; }
+        .bp-unit { font-size: 0.8rem; color: #80d4ff; font-weight: normal; }
+        .top-right { top: 40px; right: 40px; text-align: right; border-right: 3px solid #00eaff; padding-right: 15px; }
+        .bpm-value { font-size: 1.5rem; color: #00eaff; font-weight: bold; }
+        .status-badge { display: inline-block; margin-top: 5px; padding: 4px 12px; background: rgba(0, 234, 255, 0.1); border: 1px solid #00eaff; color: #00eaff; font-size: 0.75rem; border-radius: 4px; font-weight: 600; }
+        .bottom-left { bottom: 30px; left: 40px; font-size: 0.75rem; opacity: 0.6; }
+        .bottom-right { bottom: 30px; right: 40px; font-size: 0.75rem; opacity: 0.6; text-align: right; }
+        .login-content { position: relative; z-index: 5; text-align: center; width: 80%; max-width: 650px; padding: 40px 30px; background: rgba(0, 15, 40, 0.75); backdrop-filter: blur(15px); border: 1px solid rgba(0, 234, 255, 0.2); border-radius: 20px; box-shadow: 0 30px 60px rgba(0,0,0,0.7); transition: all 0.8s ease; }
+        .intro-text { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; font-size: 1.8rem; color: #00eaff; margin-bottom: 5px; letter-spacing: 1px; text-shadow: 0 0 15px rgba(0, 234, 255, 0.3); }
+        h1 { color: #fff; font-family: 'Montserrat', sans-serif; text-transform: uppercase; font-size: 2.4rem; font-weight: 800; margin: 5px 0 25px 0; letter-spacing: 2px; line-height: 1.1; text-shadow: 0 0 20px rgba(0, 150, 255, 0.6); }
+        .vip-section { border-top: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 15px 0; margin-bottom: 25px; }
+        .vip-label { font-size: 0.75rem; color: #ccc; margin-bottom: 8px; letter-spacing: 2px; text-transform: uppercase; }
+        .vip-name { font-family: 'Montserrat', sans-serif; font-size: 1.3rem; color: #00eaff; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; text-shadow: 0 0 10px rgba(0, 234, 255, 0.2); }
+        .vip-role { font-size: 0.9rem; color: #fff; font-weight: 300; }
+        .launch-btn { margin-top: 10px; width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #00eaff, #004080); border: 2px solid rgba(255, 255, 255, 0.8); cursor: pointer; display: inline-flex; justify-content: center; align-items: center; box-shadow: 0 0 40px rgba(0, 234, 255, 0.5); transition: transform 0.3s; animation: pulse-blue 2s infinite; }
+        .launch-btn svg { width: 40px; height: 40px; fill: #fff; }
+        .launch-btn:active { transform: scale(0.9); box-shadow: 0 0 10px rgba(0,234,255,0.8); }
+        .instruction-text { margin-top: 15px; font-size: 0.85rem; color: #80d4ff; letter-spacing: 2px; opacity: 0.8; animation: fadeText 2s infinite; }
+        @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(0, 234, 255, 0.6); } 70% { box-shadow: 0 0 0 25px rgba(0, 234, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 234, 255, 0); } }
+        @keyframes fadeText { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        #video-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; z-index: 5; display: flex; justify-content: center; align-items: center; }
+        /* IMPORTANT FOR TABLET: playsinline ensures video stays in container */
+        video#montage-video { width: 100%; height: 100%; object-fit: cover; }
+
+        @media screen and (max-width: 1024px) { .login-content { width: 85%; padding: 40px; max-width: 650px; } h1 { font-size: 2.2rem; } .intro-text { font-size: 1.8rem; } }
+        @media screen and (max-width: 768px) { .login-content { width: 90%; padding: 30px 20px; margin-top: 20px; } h1 { font-size: 1.5rem; margin-bottom: 20px; } .intro-text { font-size: 1.2rem; } .vip-section { padding: 15px 0; margin-bottom: 20px; } .vip-name { font-size: 1rem; } .vip-role { font-size: 0.8rem; } .top-left { top: 20px; left: 20px; } .top-right { top: 20px; right: 20px; } .bottom-left, .bottom-right { display: none; } .launch-btn { width: 70px; height: 70px; } }
+    </style>
+</head>
+<body onclick="initSystem()"> <audio id="heart-sound" loop preload="auto">
+        <source src="heartbeat.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="login-screen">
+        <div class="grid-bg"></div>
+        <canvas id="ecg-canvas"></canvas>
+
+        <div class="medical-hud top-left">
+            <h4>HOSPITAL BALING</h4>
+            <div class="bp-reading">BP: <span id="bp-val">120/80</span> <span class="bp-unit">mmHg</span></div>
+        </div>
+        <div class="medical-hud top-right">
+            <div>HR: <span id="bpm-display" class="bpm-value">--</span> <span class="bp-unit">BPM</span></div>
+            <div class="status-badge" id="status-badge">SYSTEM STANDBY</div>
+        </div>
+        <div class="medical-hud bottom-left">SECURE CONNECTION<br>ID: HB-SPEC-2026</div>
+        <div class="medical-hud bottom-right">DIAGNOSTIC MODE: ACTIVE</div>
+
+        <div class="login-content">
+            <div class="intro-text">Majlis Peluncuran</div>
+            <h1>PERKHIDMATAN KEPAKARAN<br>HOSPITAL BALING</h1>
+            <div class="vip-section">
+                <div class="vip-label">DISEMPURNAKAN OLEH</div>
+                <div class="vip-name">YBHG. DATUK DR. MAHATHAR BIN ABD WAHAB</div>
+                <div class="vip-role">Ketua Pengarah Kesihatan Malaysia</div>
+            </div>
+            <button class="launch-btn" onclick="launchSystem()">
+                <svg viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
+            </button>
+            <div class="instruction-text">SENTUH UNTUK MELANCARKAN</div>
+        </div>
+    </div>
+
+    <div id="video-screen">
+        <video id="montage-video" playsinline webkit-playsinline preload="auto">
+            <source src="montaj_rasmi.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <script>
+        const audio = document.getElementById('heart-sound');
+        const montage = document.getElementById('montage-video');
+        let systemReady = false;
+
+        // FUNGSI UNLOCK (Wajib untuk Tablet)
+        function initSystem() {
+            if (!systemReady) {
+                // Mainkan sekejap (0 volume) untuk 'unlock' media engine browser
+                audio.play().then(() => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    audio.volume = 0.8;
+                    audio.play(); // Mainkan betul-betul
+                }).catch(e => console.log("Menunggu sentuhan..."));
+                
+                // Preload video juga
+                montage.load();
+                
+                systemReady = true;
+                
+                // Cuba fullscreen (Mungkin gagal kalau bukan direct touch event, tapi kita cuba)
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(e=>{});
+                }
+            }
+        }
+
+        // --- SETUP CANVAS ---
+        const canvas = document.getElementById('ecg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height; function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; } window.addEventListener('resize', resize);
+        let x = 0; let y = 0; let speed = 2.5; let amplitude = 60; let color = '#00eaff'; let lineWidth = 4; let state = 'standby'; 
+        setTimeout(() => { resize(); y = height / 2; }, 100);
+
+        function drawECG() {
+            if(!height) return requestAnimationFrame(drawECG);
+            ctx.fillStyle = 'rgba(0, 10, 30, 0.15)'; ctx.fillRect(0, 0, width, height);
+            ctx.lineWidth = lineWidth; ctx.strokeStyle = color; ctx.shadowBlur = 15; ctx.shadowColor = color; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.beginPath(); ctx.moveTo(x, y); x += speed;
+            let waveY = height / 2; let cycle = (state === 'launch') ? 80 : 150; let pos = x % cycle;
+            if (pos > 10 && pos < 30) { waveY -= amplitude * 0.2; } else if (pos > 40 && pos < 50) { waveY += amplitude * 0.2; } else if (pos > 50 && pos < 60) { waveY -= amplitude * 1.5; } else if (pos > 60 && pos < 70) { waveY += amplitude * 0.4; } else if (pos > 90 && pos < 120) { waveY -= amplitude * 0.3; } 
+            ctx.lineTo(x, waveY); ctx.stroke(); y = waveY;
+            if (x > width) { x = 0; y = height / 2; }
+            requestAnimationFrame(drawECG);
+        }
+        drawECG();
+
+        setInterval(() => {
+            const bpmDisplay = document.getElementById('bpm-display');
+            const bpDisplay = document.getElementById('bp-val');
+            if (state === 'standby') {
+                bpmDisplay.innerText = Math.floor(Math.random() * (80 - 72) + 72);
+                let sys = Math.floor(Math.random() * (123 - 117) + 117);
+                let dia = Math.floor(Math.random() * (83 - 77) + 77);
+                bpDisplay.innerText = sys + "/" + dia;
+            } else {
+                bpmDisplay.innerText = Math.floor(Math.random() * (135 - 125) + 125);
+                let sys = Math.floor(Math.random() * (138 - 128) + 128);
+                let dia = Math.floor(Math.random() * (88 - 82) + 82);
+                bpDisplay.innerText = sys + "/" + dia;
+            }
+        }, 1200);
+
+        function launchSystem() {
+            // Panggil initSystem sekali lagi untuk kepastian
+            initSystem();
+
+            const loginBox = document.querySelector('.login-content');
+            const statusBadge = document.getElementById('status-badge');
+            
+            // Effect
+            state = 'launch'; 
+            color = '#ffffff'; 
+            lineWidth = 8; 
+            amplitude = 200; 
+            speed = 12; 
+            
+            audio.playbackRate = 1.5; 
+            audio.volume = 1.0; 
+
+            loginBox.style.transform = "scale(1.05)"; 
+            loginBox.style.opacity = "0"; 
+            
+            statusBadge.innerText = "INITIALIZING..."; 
+            statusBadge.style.background = "#fff"; 
+            statusBadge.style.color = "#000";
+
+            setTimeout(() => {
+                document.getElementById('login-screen').style.opacity = 0;
+                let fade = setInterval(() => { if(audio.volume > 0.1) audio.volume -= 0.1; else { clearInterval(fade); audio.pause(); } }, 100);
+                setTimeout(() => { 
+                    document.getElementById('login-screen').style.display = 'none'; 
+                    montage.play(); // Video akan play sbb dah 'warm up' masa initSystem
+                }, 1500); 
+            }, 5000); 
+        }
+    </script>
+</body>
+</html>
