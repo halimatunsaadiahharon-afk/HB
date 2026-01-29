@@ -9,11 +9,16 @@
     <style>
         /* --- CSS UTAMA --- */
         body, html { margin: 0; padding: 0; height: 100%; font-family: 'Montserrat', sans-serif; overflow: hidden; background: radial-gradient(circle at center, #002d5a 0%, #000812 100%); color: #fff; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        
         #login-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 2s ease; }
+        
+        /* SETUP OVERLAY */
+        #setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; color: #555; font-size: 0.8rem; letter-spacing: 2px; }
+
         .grid-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-image: linear-gradient(rgba(0, 234, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 234, 255, 0.05) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; }
         canvas#ecg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.7; }
         
-        .medical-hud { position: absolute; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; color: #80d4ff; z-index: 2; letter-spacing: 1px; text-transform: uppercase; }
+        .medical-hud { position: absolute; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; color: #80d4ff; z-index: 2; letter-spacing: 1px; text-transform: uppercase; pointer-events: none; }
         .top-left { top: 40px; left: 40px; border-left: 3px solid #00eaff; padding-left: 15px; }
         .top-left h4 { margin: 0; color: #00eaff; font-size: 1.2rem; margin-bottom: 5px; font-weight: 800; }
         .bp-reading { font-size: 1.1rem; color: #fff; font-weight: 600; letter-spacing: 1px; }
@@ -24,12 +29,10 @@
         .bottom-left { bottom: 30px; left: 40px; font-size: 0.75rem; opacity: 0.6; }
         .bottom-right { bottom: 30px; right: 40px; font-size: 0.75rem; opacity: 0.6; text-align: right; }
         
-        .login-content { position: relative; z-index: 5; text-align: center; width: 90%; max-width: 700px; padding: 40px 20px; background: rgba(0, 15, 40, 0.75); backdrop-filter: blur(15px); border: 1px solid rgba(0, 234, 255, 0.2); border-radius: 20px; box-shadow: 0 30px 60px rgba(0,0,0,0.7); transition: all 1.5s ease; }
+        .login-content { position: relative; z-index: 5; text-align: center; width: 90%; max-width: 700px; padding: 40px 20px; background: rgba(0, 15, 40, 0.75); backdrop-filter: blur(15px); border: 1px solid rgba(0, 234, 255, 0.2); border-radius: 20px; box-shadow: 0 30px 60px rgba(0,0,0,0.7); transition: all 1.5s ease; pointer-events: none; }
         
         .intro-text { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; font-size: 1.8rem; color: #00eaff; margin-bottom: 5px; letter-spacing: 1px; text-shadow: 0 0 15px rgba(0, 234, 255, 0.3); }
         
-        /* --- STYLE TAJUK (H1) DIKEMASKINI --- */
-        /* Menggunakan font responsif supaya kekal 2 baris */
         h1 { 
             color: #fff; 
             font-family: 'Montserrat', sans-serif; 
@@ -38,114 +41,96 @@
             margin: 5px 0 25px 0; 
             line-height: 1.2; 
             text-shadow: 0 0 20px rgba(0, 150, 255, 0.6);
-            /* Font saiz dinamik: Min 18px, Max 40px */
             font-size: clamp(1.1rem, 4vw, 2.5rem); 
             letter-spacing: 1px; 
-            white-space: nowrap; /* Memaksa teks jangan turun baris sendiri selain <br> */
+            white-space: nowrap; 
         }
         
-        /* Mobile adjust jika skrin terlalu sempit untuk nowrap */
-        @media screen and (max-width: 450px) {
-            h1 { white-space: normal; font-size: 1.3rem; letter-spacing: 0px; }
-        }
+        @media screen and (max-width: 450px) { h1 { white-space: normal; font-size: 1.3rem; letter-spacing: 0px; } }
 
         .vip-section { border-top: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 15px 0; margin-bottom: 25px; }
         .vip-label { font-size: 0.75rem; color: #ccc; margin-bottom: 8px; letter-spacing: 2px; text-transform: uppercase; }
         .vip-name { font-family: 'Montserrat', sans-serif; font-size: 1.3rem; color: #00eaff; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; text-shadow: 0 0 10px rgba(0, 234, 255, 0.2); }
         .vip-role { font-size: 0.9rem; color: #fff; font-weight: 300; }
         
-        /* --- STYLE UNTUK IKON HATI --- */
-        .heart-icon-container {
-            display: flex;
-            justify-content: center;
-            margin: 25px auto;
-            cursor: pointer;
-            width: fit-content;
-            transition: transform 0.2s;
-        }
-
-        .heart-icon-container:active {
-            transform: scale(0.9);
-        }
-
+        .heart-icon-container { display: flex; justify-content: center; margin: 25px auto; width: fit-content; transition: transform 0.2s; }
+        
         .heart-icon-svg {
-            width: 100px;
-            height: auto;
-            fill: #ff3860;
-            filter: drop-shadow(0 0 15px rgba(255, 56, 96, 0.6));
-            animation: heartbeat 1.2s infinite ease-in-out;
+            width: 100px; height: auto; 
+            fill: #ff3860; 
+            filter: drop-shadow(0 0 20px rgba(255, 56, 96, 0.9));
+            animation: heartbeat 0.4s infinite ease-in-out;
         }
 
         @keyframes heartbeat {
-            0% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(255, 56, 96, 0.6)); }
-            50% { transform: scale(1.15); filter: drop-shadow(0 0 25px rgba(255, 56, 96, 0.8)); }
-            100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(255, 56, 96, 0.6)); }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
         
-        .instruction-text { margin-top: 15px; font-size: 0.85rem; color: #80d4ff; letter-spacing: 2px; opacity: 0.8; animation: fadeText 2s infinite; }
-        
-        .thank-you-msg {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 800;
-            text-transform: uppercase;
-            font-size: 3.5rem;
-            letter-spacing: 5px;
-            color: #00eaff;
-            text-shadow: 0 0 30px rgba(0, 234, 255, 0.8);
-            margin: 0;
-            padding: 50px 0;
-            animation: fadeIn 2s ease;
-            line-height: 1.2;
-        }
+        .instruction-text { margin-top: 15px; font-size: 0.85rem; color: #ff3860; letter-spacing: 2px; opacity: 1; animation: flashText 0.5s infinite; font-weight: bold; }
+        @keyframes flashText { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-        @keyframes fadeText { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        /* --- SEQUENCE TEXT --- */
+        #sequence-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; text-align: center; z-index: 8; pointer-events: none; }
+        .seq-line { font-family: 'Playfair Display', serif; font-style: italic; font-size: 2.2rem; color: #fff; text-shadow: 0 0 20px rgba(0, 234, 255, 0.8); opacity: 0; transition: opacity 2s ease-in-out; margin-bottom: 15px; display: block; }
+        .seq-sub { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; color: #00eaff; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0; transition: opacity 2s ease-in-out; display: block; }
+
+        .thank-you-msg { font-family: 'Montserrat', sans-serif; font-weight: 800; text-transform: uppercase; font-size: 3.5rem; letter-spacing: 5px; color: #00eaff; text-shadow: 0 0 30px rgba(0, 234, 255, 0.8); margin: 0; padding: 50px 0; animation: fadeIn 2s ease; line-height: 1.2; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         #video-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; z-index: 5; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 1s ease; }
         video#montage-video { width: 100%; height: 100%; object-fit: cover; }
 
-        @media screen and (max-width: 1024px) { .login-content { width: 85%; padding: 40px; max-width: 650px; } .intro-text { font-size: 1.8rem; } .thank-you-msg { font-size: 3rem; } }
-        @media screen and (max-width: 768px) { .login-content { width: 90%; padding: 30px 20px; margin-top: 20px; } .intro-text { font-size: 1.2rem; } .vip-section { padding: 15px 0; margin-bottom: 20px; } .vip-name { font-size: 1rem; } .vip-role { font-size: 0.8rem; } .top-left { top: 20px; left: 20px; } .top-right { top: 20px; right: 20px; } .bottom-left, .bottom-right { display: none; } .heart-icon-svg { width: 80px; } .thank-you-msg { font-size: 2.2rem; letter-spacing: 3px; } }
+        @media screen and (max-width: 768px) { .login-content { width: 90%; padding: 30px 20px; } h1 { font-size: 1.5rem; } .vip-name { font-size: 1rem; } .heart-icon-svg { width: 80px; } .seq-line { font-size: 1.5rem; } .seq-sub { font-size: 1rem; } .thank-you-msg { font-size: 2.2rem; letter-spacing: 3px; } }
     </style>
 </head>
-<body onclick="initSystem()"> 
+<body> 
+    <div id="setup-overlay" onclick="startScene()">
+        [ TEKNIKAL: KLIK SKRIN UNTUK MULA SCENE KRITIKAL ]
+    </div>
+
     <audio id="heart-sound" loop preload="auto">
         <source src="heartbeat.mp3" type="audio/mpeg">
     </audio>
 
-    <div id="login-screen">
+    <div id="login-screen" onclick="stabilizeSystem()">
         <div class="grid-bg"></div>
         <canvas id="ecg-canvas"></canvas>
 
         <div class="medical-hud top-left">
             <h4>HOSPITAL BALING</h4>
-            <div class="bp-reading">BP: <span id="bp-val">120/80</span> <span class="bp-unit">mmHg</span></div>
+            <div class="bp-reading">BP: <span id="bp-val">165/110</span> <span class="bp-unit">mmHg</span></div>
         </div>
         <div class="medical-hud top-right">
-            <div>HR: <span id="bpm-display" class="bpm-value">--</span> <span class="bp-unit">BPM</span></div>
-            <div class="status-badge" id="status-badge">SYSTEM STANDBY</div>
+            <div>HR: <span id="bpm-display" class="bpm-value">150</span> <span class="bp-unit">BPM</span></div>
+            <div class="status-badge" id="status-badge" style="background:#ff3860; color:#fff;">CRITICAL ALERT</div>
         </div>
         <div class="medical-hud bottom-left">SECURE CONNECTION<br>ID: HB-SPEC-2026</div>
         <div class="medical-hud bottom-right">DIAGNOSTIC MODE: ACTIVE</div>
 
+        <div id="sequence-text">
+            <span class="seq-line" id="text-line-1">"Di sinilah setiap saat membawa makna"</span>
+            <span class="seq-sub" id="text-line-2">DARI KECEMASAN... LAHIRLAH HARAPAN</span>
+        </div>
+
         <div class="login-content">
             <div class="intro-text">Majlis Peluncuran</div>
-            
             <h1>PERKHIDMATAN KEPAKARAN<br>HOSPITAL BALING</h1>
-            
             <div class="vip-section">
                 <div class="vip-label">DISEMPURNAKAN OLEH</div>
                 <div class="vip-name">YBHG. DATUK DR. MAHATHAR BIN ABD WAHAB</div>
                 <div class="vip-role">Ketua Pengarah Kesihatan Malaysia</div>
             </div>
             
-            <div class="heart-icon-container" onclick="launchSystem()">
-                <svg class="heart-icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <div class="heart-icon-container">
+                <svg class="heart-icon-svg" id="heart-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                 </svg>
             </div>
 
-            <div class="instruction-text">SENTUH UNTUK MELANCARKAN</div>
+            <div class="instruction-text" id="instruct-text">SENTUH UNTUK STABILKAN</div>
         </div>
     </div>
 
@@ -161,39 +146,115 @@
         const loginScreen = document.getElementById('login-screen');
         const videoScreen = document.getElementById('video-screen');
         const contentBox = document.querySelector('.login-content');
-        let systemReady = false;
+        const seqLine1 = document.getElementById('text-line-1');
+        const seqLine2 = document.getElementById('text-line-2');
+        const heartSvg = document.getElementById('heart-svg');
+        const instructText = document.getElementById('instruct-text');
+        const statusBadge = document.getElementById('status-badge');
 
-        function initSystem() {
-            if (!systemReady) {
-                audio.play().then(() => {
-                    audio.pause();
-                    audio.currentTime = 0;
-                    audio.volume = 0.8;
-                    audio.play(); 
-                }).catch(e => console.log("Menunggu sentuhan..."));
-                
-                montage.load();
-                systemReady = true;
-                
-                if (document.documentElement.requestFullscreen) {
-                    document.documentElement.requestFullscreen().catch(e=>{});
-                }
-            }
-        }
+        let sceneStarted = false; 
+        let systemStabilized = false; 
+
+        // --- PARAMETER VISUAL ECG (Mula dengan KRITIKAL) ---
+        let x = 0; let y = 0; 
+        let speed = 15;         
+        let amplitude = 200;    
+        let color = '#ff3860';  
+        let lineWidth = 10;     
+        let state = 'critical'; 
 
         const canvas = document.getElementById('ecg-canvas');
         const ctx = canvas.getContext('2d');
-        let width, height; function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; } window.addEventListener('resize', resize);
-        let x = 0; let y = 0; let speed = 2.5; let amplitude = 60; let color = '#00eaff'; let lineWidth = 4; let state = 'standby'; 
+        let width, height; 
+        function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; } 
+        window.addEventListener('resize', resize);
         setTimeout(() => { resize(); y = height / 2; }, 100);
+
+        function startScene() {
+            document.getElementById('setup-overlay').style.display = 'none';
+            audio.volume = 1.0;
+            audio.playbackRate = 1.8; 
+            audio.play();
+            montage.load();
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(e=>{});
+            }
+            sceneStarted = true;
+        }
+
+        function stabilizeSystem() {
+            if (!sceneStarted || systemStabilized) return; 
+            
+            systemStabilized = true;
+
+            // 1. TUKAR KE NORMAL (STABIL & BANYAK)
+            state = 'stable';
+            color = '#00eaff'; 
+            
+            lineWidth = 8;     
+            amplitude = 130;   
+            speed = 3.5;       
+            
+            audio.playbackRate = 1.0; 
+            
+            statusBadge.innerText = "VITALS STABILIZED";
+            statusBadge.style.background = "rgba(0, 234, 255, 0.1)";
+            statusBadge.style.color = "#00eaff";
+            
+            heartSvg.style.fill = "#00eaff";
+            heartSvg.style.animation = "heartbeat 1.2s infinite ease-in-out";
+            
+            instructText.style.display = 'none';
+            contentBox.style.transition = "opacity 1s, transform 1s";
+            contentBox.style.opacity = "0";
+            contentBox.style.transform = "scale(0.95)";
+
+            setTimeout(() => { seqLine1.style.opacity = "1"; }, 1000);
+            setTimeout(() => { seqLine2.style.opacity = "1"; }, 4000);
+
+            setTimeout(() => {
+                loginScreen.style.opacity = 0;
+                let fade = setInterval(() => { if(audio.volume > 0.1) audio.volume -= 0.1; else { clearInterval(fade); audio.pause(); } }, 100);
+                setTimeout(() => { 
+                    loginScreen.style.display = 'none'; 
+                    montage.play(); 
+                }, 1500);
+            }, 8000); 
+        }
 
         function drawECG() {
             if(!height) return requestAnimationFrame(drawECG);
             ctx.fillStyle = 'rgba(0, 10, 30, 0.15)'; ctx.fillRect(0, 0, width, height);
-            ctx.lineWidth = lineWidth; ctx.strokeStyle = color; ctx.shadowBlur = 15; ctx.shadowColor = color; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            
+            ctx.lineWidth = lineWidth; 
+            ctx.strokeStyle = color; 
+            ctx.shadowBlur = (state === 'critical') ? 20 : 15; 
+            ctx.shadowColor = color; 
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            
             ctx.beginPath(); ctx.moveTo(x, y); x += speed;
-            let waveY = height / 2; let cycle = (state === 'launch') ? 80 : 150; let pos = x % cycle;
-            if (pos > 10 && pos < 30) { waveY -= amplitude * 0.2; } else if (pos > 40 && pos < 50) { waveY += amplitude * 0.2; } else if (pos > 50 && pos < 60) { waveY -= amplitude * 1.5; } else if (pos > 60 && pos < 70) { waveY += amplitude * 0.4; } else if (pos > 90 && pos < 120) { waveY -= amplitude * 0.3; } 
+            
+            // --- KEPADATAN GELOMBANG DIPERTINGKATKAN ---
+            // cycle = 70 (Lebih rapat = lebih banyak gelombang)
+            let cycle = (state === 'stable') ? 70 : 50; 
+            let pos = x % cycle;
+            let waveY = height / 2; 
+            
+            if(state === 'stable') {
+                // Pola ECG Normal (P-QRS-T) yang rapat dan bersambung
+                // Tidak ada ruang kosong (garisan rata) yang panjang
+                if (pos > 0 && pos < 10) { waveY -= amplitude * 0.15; } // P
+                else if (pos > 15 && pos < 20) { waveY += amplitude * 0.15; } // Q
+                else if (pos > 20 && pos < 30) { waveY -= amplitude * 1.5; } // R (Spike Tinggi)
+                else if (pos > 30 && pos < 35) { waveY += amplitude * 0.3; } // S
+                else if (pos > 40 && pos < 60) { waveY -= amplitude * 0.25; } // T
+            } else {
+                // Pola Kritikal (Rawak)
+                if (pos > 10 && pos < 30) { waveY -= amplitude * 0.8; } 
+                else if (pos > 30 && pos < 50) { waveY += amplitude * 0.9; } 
+                else { waveY += (Math.random() - 0.5) * 30; }
+            }
+            
             ctx.lineTo(x, waveY); ctx.stroke(); y = waveY;
             if (x > width) { x = 0; y = height / 2; }
             requestAnimationFrame(drawECG);
@@ -203,62 +264,41 @@
         setInterval(() => {
             const bpmDisplay = document.getElementById('bpm-display');
             const bpDisplay = document.getElementById('bp-val');
-            if (state === 'standby') {
+            
+            if (state === 'stable') {
                 bpmDisplay.innerText = Math.floor(Math.random() * (80 - 72) + 72);
                 let sys = Math.floor(Math.random() * (123 - 117) + 117);
                 let dia = Math.floor(Math.random() * (83 - 77) + 77);
                 bpDisplay.innerText = sys + "/" + dia;
+                bpDisplay.style.color = "#fff";
+                bpmDisplay.style.color = "#00eaff";
             } else {
-                bpmDisplay.innerText = Math.floor(Math.random() * (135 - 125) + 125);
-                let sys = Math.floor(Math.random() * (138 - 128) + 128);
-                let dia = Math.floor(Math.random() * (88 - 82) + 82);
+                bpmDisplay.innerText = Math.floor(Math.random() * (165 - 150) + 150);
+                let sys = Math.floor(Math.random() * (170 - 160) + 160);
+                let dia = Math.floor(Math.random() * (110 - 100) + 100);
                 bpDisplay.innerText = sys + "/" + dia;
+                bpDisplay.style.color = "#ff3860";
+                bpmDisplay.style.color = "#ff3860";
             }
-        }, 1200);
-
-        function launchSystem() {
-            initSystem();
-            const statusBadge = document.getElementById('status-badge');
-            
-            state = 'launch'; 
-            color = '#ffffff'; 
-            lineWidth = 8; 
-            amplitude = 200; 
-            speed = 12; 
-            
-            audio.playbackRate = 1.5; 
-            audio.volume = 1.0; 
-
-            contentBox.style.transform = "scale(1.05)"; 
-            contentBox.style.opacity = "0"; 
-            
-            statusBadge.innerText = "INITIALIZING..."; 
-            statusBadge.style.background = "#fff"; 
-            statusBadge.style.color = "#000";
-
-            setTimeout(() => {
-                loginScreen.style.opacity = 0;
-                let fade = setInterval(() => { if(audio.volume > 0.1) audio.volume -= 0.1; else { clearInterval(fade); audio.pause(); } }, 100);
-                setTimeout(() => { 
-                    loginScreen.style.display = 'none'; 
-                    montage.play(); 
-                }, 1500); 
-            }, 5000); 
-        }
+        }, (state==='critical') ? 200 : 1200);
 
         montage.addEventListener('ended', function() {
             videoScreen.style.opacity = 0;
             loginScreen.style.display = 'flex';
+            
+            seqLine1.style.opacity = "0";
+            seqLine2.style.opacity = "0";
+
             setTimeout(() => {
                 loginScreen.style.opacity = 1;
                 videoScreen.style.display = 'none';
             }, 100);
 
-            state = 'standby';
+            state = 'stable';
             color = '#00eaff';
-            lineWidth = 4;
-            amplitude = 60;
-            speed = 2.5;
+            lineWidth = 8;
+            amplitude = 130;
+            speed = 3.5;
 
             contentBox.innerHTML = '<h2 class="thank-you-msg">TERIMA KASIH</h2>';
             contentBox.style.opacity = 1;
