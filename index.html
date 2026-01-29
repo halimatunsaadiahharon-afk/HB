@@ -15,8 +15,8 @@
         /* SETUP OVERLAY */
         #setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; color: #555; font-size: 0.8rem; letter-spacing: 2px; }
 
-        .grid-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-image: linear-gradient(rgba(0, 234, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 234, 255, 0.05) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; }
-        canvas#ecg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.7; }
+        .grid-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-image: linear-gradient(rgba(0, 234, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 234, 255, 0.05) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
+        canvas#ecg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.9; }
         
         .medical-hud { position: absolute; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; color: #80d4ff; z-index: 2; letter-spacing: 1px; text-transform: uppercase; pointer-events: none; }
         .top-left { top: 40px; left: 40px; border-left: 3px solid #00eaff; padding-left: 15px; }
@@ -33,19 +33,7 @@
         
         .intro-text { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; font-size: 1.8rem; color: #00eaff; margin-bottom: 5px; letter-spacing: 1px; text-shadow: 0 0 15px rgba(0, 234, 255, 0.3); }
         
-        h1 { 
-            color: #fff; 
-            font-family: 'Montserrat', sans-serif; 
-            text-transform: uppercase; 
-            font-weight: 800; 
-            margin: 5px 0 25px 0; 
-            line-height: 1.2; 
-            text-shadow: 0 0 20px rgba(0, 150, 255, 0.6);
-            font-size: clamp(1.1rem, 4vw, 2.5rem); 
-            letter-spacing: 1px; 
-            white-space: nowrap; 
-        }
-        
+        h1 { color: #fff; font-family: 'Montserrat', sans-serif; text-transform: uppercase; font-weight: 800; margin: 5px 0 25px 0; line-height: 1.2; text-shadow: 0 0 20px rgba(0, 150, 255, 0.6); font-size: clamp(1.1rem, 4vw, 2.5rem); letter-spacing: 1px; white-space: nowrap; }
         @media screen and (max-width: 450px) { h1 { white-space: normal; font-size: 1.3rem; letter-spacing: 0px; } }
 
         .vip-section { border-top: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 15px 0; margin-bottom: 25px; }
@@ -54,46 +42,48 @@
         .vip-role { font-size: 0.9rem; color: #fff; font-weight: 300; }
         
         .heart-icon-container { display: flex; justify-content: center; margin: 25px auto; width: fit-content; transition: transform 0.2s; }
-        
-        .heart-icon-svg {
-            width: 100px; height: auto; 
-            fill: #ff3860; 
-            filter: drop-shadow(0 0 20px rgba(255, 56, 96, 0.9));
-            animation: heartbeat 0.4s infinite ease-in-out;
-        }
-
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
+        .heart-icon-svg { width: 100px; height: auto; fill: #ff3860; filter: drop-shadow(0 0 20px rgba(255, 56, 96, 0.9)); animation: heartbeat 0.4s infinite ease-in-out; }
+        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
         
         .instruction-text { margin-top: 15px; font-size: 0.85rem; color: #ff3860; letter-spacing: 2px; opacity: 1; animation: flashText 0.5s infinite; font-weight: bold; }
         @keyframes flashText { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-        /* --- SEQUENCE TEXT --- */
-        #sequence-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; text-align: center; z-index: 8; pointer-events: none; }
-        .seq-line { font-family: 'Playfair Display', serif; font-style: italic; font-size: 2.2rem; color: #fff; text-shadow: 0 0 20px rgba(0, 234, 255, 0.8); opacity: 0; transition: opacity 2s ease-in-out; margin-bottom: 15px; display: block; }
-        .seq-sub { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; color: #00eaff; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0; transition: opacity 2s ease-in-out; display: block; }
+        #sequence-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 95%; text-align: center; z-index: 8; pointer-events: none; }
+        
+        .seq-line { font-family: 'Playfair Display', serif; font-style: italic; font-size: 2.2rem; color: #fff; text-shadow: 0 0 20px rgba(0, 234, 255, 0.8); opacity: 0; transition: opacity 1.5s ease-in-out; margin-bottom: 10px; display: block; }
+        .seq-sub { font-family: 'Montserrat', sans-serif; font-size: 1.4rem; color: #80d4ff; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0; transition: opacity 1.5s ease-in-out; display: block; margin-bottom: 30px; }
+        .seq-corp { font-family: 'Montserrat', sans-serif; font-size: 3rem; font-weight: 800; color: #ffffff; letter-spacing: 3px; text-transform: uppercase; opacity: 0; transition: opacity 1.5s ease-in-out; display: inline-block; border-top: 2px solid #00eaff; border-bottom: 2px solid #00eaff; padding: 15px 0; text-shadow: 0 0 30px rgba(0, 234, 255, 0.9); margin-top: 20px; line-height: 1.2; }
 
-        .thank-you-msg { font-family: 'Montserrat', sans-serif; font-weight: 800; text-transform: uppercase; font-size: 3.5rem; letter-spacing: 5px; color: #00eaff; text-shadow: 0 0 30px rgba(0, 234, 255, 0.8); margin: 0; padding: 50px 0; animation: fadeIn 2s ease; line-height: 1.2; }
-
+        /* CLOSING TEXT UPDATE: SEBARIS & KECIL SEDIKIT */
+        .closing-msg { 
+            font-family: 'Montserrat', sans-serif; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            font-size: 2.8rem; /* Dikecilkan dari 3.5rem */
+            letter-spacing: 3px; 
+            color: #00eaff; 
+            text-shadow: 0 0 40px rgba(0, 234, 255, 0.9); 
+            margin: 0; 
+            padding: 60px 0; 
+            animation: fadeIn 2s ease; 
+            line-height: 1.1;
+            white-space: nowrap; /* Memastikan teks kekal sebaris */
+        }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         #video-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; z-index: 5; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 1s ease; }
         video#montage-video { width: 100%; height: 100%; object-fit: cover; }
 
-        @media screen and (max-width: 768px) { .login-content { width: 90%; padding: 30px 20px; } h1 { font-size: 1.5rem; } .vip-name { font-size: 1rem; } .heart-icon-svg { width: 80px; } .seq-line { font-size: 1.5rem; } .seq-sub { font-size: 1rem; } .thank-you-msg { font-size: 2.2rem; letter-spacing: 3px; } }
+        @media screen and (max-width: 768px) { 
+            .login-content { width: 90%; padding: 30px 20px; } h1 { font-size: 1.5rem; } 
+            .heart-icon-svg { width: 80px; } .seq-line { font-size: 1.3rem; } .seq-sub { font-size: 0.9rem; } .seq-corp { font-size: 1.8rem; letter-spacing: 1px; padding: 10px 0; }
+            .closing-msg { font-size: 1.5rem; letter-spacing: 1px; } /* Mobile size adjusted */
+        }
     </style>
 </head>
 <body> 
-    <div id="setup-overlay" onclick="startScene()">
-        [ TEKNIKAL: KLIK SKRIN UNTUK MULA SCENE KRITIKAL ]
-    </div>
-
-    <audio id="heart-sound" loop preload="auto">
-        <source src="heartbeat.mp3" type="audio/mpeg">
-    </audio>
+    <div id="setup-overlay" onclick="startScene()">[ TEKNIKAL: KLIK SKRIN UNTUK MULA SCENE KRITIKAL ]</div>
+    <audio id="heart-sound" loop preload="auto"><source src="heartbeat.mp3" type="audio/mpeg"></audio>
 
     <div id="login-screen" onclick="stabilizeSystem()">
         <div class="grid-bg"></div>
@@ -113,6 +103,8 @@
         <div id="sequence-text">
             <span class="seq-line" id="text-line-1">"Di sinilah setiap saat membawa makna"</span>
             <span class="seq-sub" id="text-line-2">DARI KECEMASAN... LAHIRLAH HARAPAN</span>
+            <br>
+            <span class="seq-corp" id="text-line-3">PERKHIDMATAN KEPAKARAN<br>MERENTAS SEMPADAN</span>
         </div>
 
         <div class="login-content">
@@ -123,13 +115,11 @@
                 <div class="vip-name">YBHG. DATUK DR. MAHATHAR BIN ABD WAHAB</div>
                 <div class="vip-role">Ketua Pengarah Kesihatan Malaysia</div>
             </div>
-            
             <div class="heart-icon-container">
                 <svg class="heart-icon-svg" id="heart-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                 </svg>
             </div>
-
             <div class="instruction-text" id="instruct-text">SENTUH UNTUK STABILKAN</div>
         </div>
     </div>
@@ -148,6 +138,7 @@
         const contentBox = document.querySelector('.login-content');
         const seqLine1 = document.getElementById('text-line-1');
         const seqLine2 = document.getElementById('text-line-2');
+        const seqLine3 = document.getElementById('text-line-3');
         const heartSvg = document.getElementById('heart-svg');
         const instructText = document.getElementById('instruct-text');
         const statusBadge = document.getElementById('status-badge');
@@ -155,12 +146,11 @@
         let sceneStarted = false; 
         let systemStabilized = false; 
 
-        // --- PARAMETER VISUAL ECG (Mula dengan KRITIKAL) ---
         let x = 0; let y = 0; 
         let speed = 15;         
         let amplitude = 200;    
         let color = '#ff3860';  
-        let lineWidth = 10;     
+        let lineWidth = 8;     
         let state = 'critical'; 
 
         const canvas = document.getElementById('ecg-canvas');
@@ -184,16 +174,13 @@
 
         function stabilizeSystem() {
             if (!sceneStarted || systemStabilized) return; 
-            
             systemStabilized = true;
 
-            // 1. TUKAR KE NORMAL (STABIL & BANYAK)
             state = 'stable';
             color = '#00eaff'; 
-            
-            lineWidth = 8;     
-            amplitude = 130;   
-            speed = 3.5;       
+            lineWidth = 6;     
+            amplitude = 150;   
+            speed = 4;         
             
             audio.playbackRate = 1.0; 
             
@@ -209,8 +196,10 @@
             contentBox.style.opacity = "0";
             contentBox.style.transform = "scale(0.95)";
 
+            // TIMING SEQUENCE
             setTimeout(() => { seqLine1.style.opacity = "1"; }, 1000);
             setTimeout(() => { seqLine2.style.opacity = "1"; }, 4000);
+            setTimeout(() => { seqLine3.style.opacity = "1"; }, 7000);
 
             setTimeout(() => {
                 loginScreen.style.opacity = 0;
@@ -219,7 +208,7 @@
                     loginScreen.style.display = 'none'; 
                     montage.play(); 
                 }, 1500);
-            }, 8000); 
+            }, 11000); 
         }
 
         function drawECG() {
@@ -228,28 +217,24 @@
             
             ctx.lineWidth = lineWidth; 
             ctx.strokeStyle = color; 
-            ctx.shadowBlur = (state === 'critical') ? 20 : 15; 
+            ctx.shadowBlur = (state === 'critical') ? 20 : 10; 
             ctx.shadowColor = color; 
-            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.lineCap = 'square'; ctx.lineJoin = 'miter'; 
             
             ctx.beginPath(); ctx.moveTo(x, y); x += speed;
             
-            // --- KEPADATAN GELOMBANG DIPERTINGKATKAN ---
-            // cycle = 70 (Lebih rapat = lebih banyak gelombang)
-            let cycle = (state === 'stable') ? 70 : 50; 
+            let cycle = (state === 'stable') ? 200 : 50; 
             let pos = x % cycle;
             let waveY = height / 2; 
             
             if(state === 'stable') {
-                // Pola ECG Normal (P-QRS-T) yang rapat dan bersambung
-                // Tidak ada ruang kosong (garisan rata) yang panjang
-                if (pos > 0 && pos < 10) { waveY -= amplitude * 0.15; } // P
-                else if (pos > 15 && pos < 20) { waveY += amplitude * 0.15; } // Q
-                else if (pos > 20 && pos < 30) { waveY -= amplitude * 1.5; } // R (Spike Tinggi)
-                else if (pos > 30 && pos < 35) { waveY += amplitude * 0.3; } // S
-                else if (pos > 40 && pos < 60) { waveY -= amplitude * 0.25; } // T
+                if (pos > 20 && pos < 40) { waveY -= amplitude * 0.1; } 
+                else if (pos > 50 && pos < 55) { waveY += amplitude * 0.1; } 
+                else if (pos >= 55 && pos < 60) { waveY -= amplitude * 1.5; } 
+                else if (pos >= 60 && pos < 65) { waveY += amplitude * 1.5; } 
+                else if (pos >= 65 && pos < 70) { waveY += amplitude * 0.3; }
+                else if (pos > 90 && pos < 120) { waveY -= amplitude * 0.2; }
             } else {
-                // Pola Kritikal (Rawak)
                 if (pos > 10 && pos < 30) { waveY -= amplitude * 0.8; } 
                 else if (pos > 30 && pos < 50) { waveY += amplitude * 0.9; } 
                 else { waveY += (Math.random() - 0.5) * 30; }
@@ -288,6 +273,7 @@
             
             seqLine1.style.opacity = "0";
             seqLine2.style.opacity = "0";
+            seqLine3.style.opacity = "0"; 
 
             setTimeout(() => {
                 loginScreen.style.opacity = 1;
@@ -296,11 +282,12 @@
 
             state = 'stable';
             color = '#00eaff';
-            lineWidth = 8;
-            amplitude = 130;
-            speed = 3.5;
+            lineWidth = 6;
+            amplitude = 150;
+            speed = 4;
 
-            contentBox.innerHTML = '<h2 class="thank-you-msg">TERIMA KASIH</h2>';
+            // PENUTUP SEBARIS & KECIL SEDIKIT
+            contentBox.innerHTML = '<h2 class="closing-msg">KAMI SEDIA MEMBANTU</h2>';
             contentBox.style.opacity = 1;
             contentBox.style.transform = "scale(1)";
         });
