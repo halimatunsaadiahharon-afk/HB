@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+
     <title>Perasmian Hospital Baling</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,600&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     
@@ -13,7 +19,7 @@
         #login-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 2s ease; }
         
         /* SETUP OVERLAY */
-        #setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; color: #555; font-size: 0.8rem; letter-spacing: 2px; }
+        #setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; color: #555; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
 
         .grid-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-image: linear-gradient(rgba(0, 234, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 234, 255, 0.05) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
         canvas#ecg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.9; }
@@ -54,12 +60,11 @@
         .seq-sub { font-family: 'Montserrat', sans-serif; font-size: 1.4rem; color: #80d4ff; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0; transition: opacity 1.5s ease-in-out; display: block; margin-bottom: 30px; }
         .seq-corp { font-family: 'Montserrat', sans-serif; font-size: 3rem; font-weight: 800; color: #ffffff; letter-spacing: 3px; text-transform: uppercase; opacity: 0; transition: opacity 1.5s ease-in-out; display: inline-block; border-top: 2px solid #00eaff; border-bottom: 2px solid #00eaff; padding: 15px 0; text-shadow: 0 0 30px rgba(0, 234, 255, 0.9); margin-top: 20px; line-height: 1.2; }
 
-        /* CLOSING TEXT UPDATE: SEBARIS & KECIL SEDIKIT */
         .closing-msg { 
             font-family: 'Montserrat', sans-serif; 
             font-weight: 800; 
             text-transform: uppercase; 
-            font-size: 2.8rem; /* Dikecilkan dari 3.5rem */
+            font-size: 2.8rem; 
             letter-spacing: 3px; 
             color: #00eaff; 
             text-shadow: 0 0 40px rgba(0, 234, 255, 0.9); 
@@ -67,7 +72,7 @@
             padding: 60px 0; 
             animation: fadeIn 2s ease; 
             line-height: 1.1;
-            white-space: nowrap; /* Memastikan teks kekal sebaris */
+            white-space: nowrap; 
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -77,12 +82,14 @@
         @media screen and (max-width: 768px) { 
             .login-content { width: 90%; padding: 30px 20px; } h1 { font-size: 1.5rem; } 
             .heart-icon-svg { width: 80px; } .seq-line { font-size: 1.3rem; } .seq-sub { font-size: 0.9rem; } .seq-corp { font-size: 1.8rem; letter-spacing: 1px; padding: 10px 0; }
-            .closing-msg { font-size: 1.5rem; letter-spacing: 1px; } /* Mobile size adjusted */
+            .closing-msg { font-size: 1.5rem; letter-spacing: 1px; } 
         }
     </style>
 </head>
 <body> 
-    <div id="setup-overlay" onclick="startScene()">[ TEKNIKAL: KLIK SKRIN UNTUK MULA SCENE KRITIKAL ]</div>
+    <div id="setup-overlay" onclick="startScene()">[ KLIK UNTUK MULA PAPARAN ]</div>
+    
+    <audio id="venti-sound" loop preload="auto"><source src="venti.mp3" type="audio/mpeg"></audio>
     <audio id="heart-sound" loop preload="auto"><source src="heartbeat.mp3" type="audio/mpeg"></audio>
 
     <div id="login-screen" onclick="stabilizeSystem()">
@@ -131,7 +138,8 @@
     </div>
 
     <script>
-        const audio = document.getElementById('heart-sound');
+        const ventiAudio = document.getElementById('venti-sound');
+        const heartAudio = document.getElementById('heart-sound');
         const montage = document.getElementById('montage-video');
         const loginScreen = document.getElementById('login-screen');
         const videoScreen = document.getElementById('video-screen');
@@ -146,6 +154,7 @@
         let sceneStarted = false; 
         let systemStabilized = false; 
 
+        // --- PARAMETER AWAL (KRITIKAL) ---
         let x = 0; let y = 0; 
         let speed = 15;         
         let amplitude = 200;    
@@ -160,29 +169,53 @@
         window.addEventListener('resize', resize);
         setTimeout(() => { resize(); y = height / 2; }, 100);
 
+        // --- FUNGSI 1: START SCENE (TEKNIKAL KLIK UNTUK KRITIKAL) ---
         function startScene() {
             document.getElementById('setup-overlay').style.display = 'none';
-            audio.volume = 1.0;
-            audio.playbackRate = 1.8; 
-            audio.play();
+            
+            // Mainkan Venti.mp3 (Kritikal)
+            ventiAudio.volume = 1.0;
+            ventiAudio.play();
+            
             montage.load();
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(e=>{});
-            }
+            
+            // PAKSA FULL SCREEN
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) { elem.requestFullscreen().catch(err => console.log(err)); } 
+            else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); } 
+            else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
+            
             sceneStarted = true;
         }
 
+        // --- FUNGSI 2: VIP SENTUH (STABILKAN) ---
         function stabilizeSystem() {
             if (!sceneStarted || systemStabilized) return; 
             systemStabilized = true;
 
+            // 1. TUKAR AUDIO: Stop Venti, Start Heartbeat
+            let vol = 1.0;
+            let fadeOutVenti = setInterval(() => {
+                if (vol > 0.1) {
+                    vol -= 0.1;
+                    ventiAudio.volume = vol;
+                } else {
+                    clearInterval(fadeOutVenti);
+                    ventiAudio.pause();
+                    ventiAudio.currentTime = 0;
+                }
+            }, 100);
+
+            heartAudio.volume = 1.0;
+            heartAudio.currentTime = 0;
+            heartAudio.play();
+
+            // 2. TUKAR VISUAL KE STABIL
             state = 'stable';
             color = '#00eaff'; 
             lineWidth = 6;     
             amplitude = 150;   
             speed = 4;         
-            
-            audio.playbackRate = 1.0; 
             
             statusBadge.innerText = "VITALS STABILIZED";
             statusBadge.style.background = "rgba(0, 234, 255, 0.1)";
@@ -201,9 +234,12 @@
             setTimeout(() => { seqLine2.style.opacity = "1"; }, 4000);
             setTimeout(() => { seqLine3.style.opacity = "1"; }, 7000);
 
+            // Masuk Video
             setTimeout(() => {
                 loginScreen.style.opacity = 0;
-                let fade = setInterval(() => { if(audio.volume > 0.1) audio.volume -= 0.1; else { clearInterval(fade); audio.pause(); } }, 100);
+                // Fade out heartbeat sebelum video
+                let fadeHeart = setInterval(() => { if(heartAudio.volume > 0.1) heartAudio.volume -= 0.1; else { clearInterval(fadeHeart); heartAudio.pause(); } }, 100);
+                
                 setTimeout(() => { 
                     loginScreen.style.display = 'none'; 
                     montage.play(); 
@@ -211,6 +247,7 @@
             }, 11000); 
         }
 
+        // --- DRAWING ECG (P-QRS-T) ---
         function drawECG() {
             if(!height) return requestAnimationFrame(drawECG);
             ctx.fillStyle = 'rgba(0, 10, 30, 0.15)'; ctx.fillRect(0, 0, width, height);
@@ -267,6 +304,7 @@
             }
         }, (state==='critical') ? 200 : 1200);
 
+        // --- VIDEO TAMAT -> TEXT -> AUTO EXIT & CLOSE SELEPAS 10 SAAT ---
         montage.addEventListener('ended', function() {
             videoScreen.style.opacity = 0;
             loginScreen.style.display = 'flex';
@@ -290,6 +328,24 @@
             contentBox.innerHTML = '<h2 class="closing-msg">KAMI SEDIA MEMBANTU</h2>';
             contentBox.style.opacity = 1;
             contentBox.style.transform = "scale(1)";
+
+            // --- AUTO EXIT & CLOSE SELEPAS 10 SAAT ---
+            setTimeout(() => {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+
+                try {
+                    window.open('', '_self', '');
+                    window.close();
+                } catch(e) {}
+
+                // FALLBACK
+                document.body.style.transition = "opacity 2s";
+                document.body.style.opacity = "0";
+                setTimeout(() => {
+                    window.location.href = "about:blank"; 
+                }, 2000);
+            }, 10000); 
         });
     </script>
 </body>
