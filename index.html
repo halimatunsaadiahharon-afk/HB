@@ -18,7 +18,6 @@
         
         #login-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 2s ease; }
         
-        /* SETUP OVERLAY */
         #setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; color: #555; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
 
         .grid-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-image: linear-gradient(rgba(0, 234, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 234, 255, 0.05) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
@@ -61,18 +60,7 @@
         .seq-corp { font-family: 'Montserrat', sans-serif; font-size: 3rem; font-weight: 800; color: #ffffff; letter-spacing: 3px; text-transform: uppercase; opacity: 0; transition: opacity 1.5s ease-in-out; display: inline-block; border-top: 2px solid #00eaff; border-bottom: 2px solid #00eaff; padding: 15px 0; text-shadow: 0 0 30px rgba(0, 234, 255, 0.9); margin-top: 20px; line-height: 1.2; }
 
         .closing-msg { 
-            font-family: 'Montserrat', sans-serif; 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            font-size: 2.8rem; 
-            letter-spacing: 3px; 
-            color: #00eaff; 
-            text-shadow: 0 0 40px rgba(0, 234, 255, 0.9); 
-            margin: 0; 
-            padding: 60px 0; 
-            animation: fadeIn 2s ease; 
-            line-height: 1.1;
-            white-space: nowrap; 
+            font-family: 'Montserrat', sans-serif; font-weight: 800; text-transform: uppercase; font-size: 2.8rem; letter-spacing: 3px; color: #00eaff; text-shadow: 0 0 40px rgba(0, 234, 255, 0.9); margin: 0; padding: 60px 0; animation: fadeIn 2s ease; line-height: 1.1; white-space: nowrap; 
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -169,17 +157,23 @@
         window.addEventListener('resize', resize);
         setTimeout(() => { resize(); y = height / 2; }, 100);
 
-        // --- FUNGSI 1: START SCENE (TEKNIKAL KLIK UNTUK KRITIKAL) ---
+        // --- FUNGSI 1: START SCENE (TEKNIKAL KLIK) ---
         function startScene() {
             document.getElementById('setup-overlay').style.display = 'none';
             
-            // Mainkan Venti.mp3 (Kritikal)
-            ventiAudio.volume = 1.0;
+            // 1. Play audio KRITIKAL (Volume sederhana supaya tak bingit)
+            ventiAudio.volume = 0.5; // VOLUME VENTI DITURUNKAN KE 50%
             ventiAudio.play();
+
+            // 2. UNLOCK AUDIO KEDUA
+            // Mainkan heartbeat sekejap (volume 0) kemudian pause
+            heartAudio.volume = 0; 
+            heartAudio.play().then(() => {
+                setTimeout(() => { heartAudio.pause(); heartAudio.currentTime = 0; }, 100); 
+            }).catch(e => console.log("Audio unlock error"));
             
             montage.load();
             
-            // PAKSA FULL SCREEN
             const elem = document.documentElement;
             if (elem.requestFullscreen) { elem.requestFullscreen().catch(err => console.log(err)); } 
             else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); } 
@@ -193,24 +187,14 @@
             if (!sceneStarted || systemStabilized) return; 
             systemStabilized = true;
 
-            // 1. TUKAR AUDIO: Stop Venti, Start Heartbeat
-            let vol = 1.0;
-            let fadeOutVenti = setInterval(() => {
-                if (vol > 0.1) {
-                    vol -= 0.1;
-                    ventiAudio.volume = vol;
-                } else {
-                    clearInterval(fadeOutVenti);
-                    ventiAudio.pause();
-                    ventiAudio.currentTime = 0;
-                }
-            }, 100);
-
-            heartAudio.volume = 1.0;
+            // 1. STOP Venti & PLAY Heartbeat (PASTIKAN VOLUME 100%)
+            ventiAudio.pause(); // Matikan terus venti
+            
+            heartAudio.volume = 1.0; // VOLUME HEARTBEAT MAKIMUM 100%
             heartAudio.currentTime = 0;
             heartAudio.play();
 
-            // 2. TUKAR VISUAL KE STABIL
+            // 2. Ubah Visual
             state = 'stable';
             color = '#00eaff'; 
             lineWidth = 6;     
@@ -229,17 +213,13 @@
             contentBox.style.opacity = "0";
             contentBox.style.transform = "scale(0.95)";
 
-            // TIMING SEQUENCE
             setTimeout(() => { seqLine1.style.opacity = "1"; }, 1000);
             setTimeout(() => { seqLine2.style.opacity = "1"; }, 4000);
             setTimeout(() => { seqLine3.style.opacity = "1"; }, 7000);
 
-            // Masuk Video
             setTimeout(() => {
                 loginScreen.style.opacity = 0;
-                // Fade out heartbeat sebelum video
                 let fadeHeart = setInterval(() => { if(heartAudio.volume > 0.1) heartAudio.volume -= 0.1; else { clearInterval(fadeHeart); heartAudio.pause(); } }, 100);
-                
                 setTimeout(() => { 
                     loginScreen.style.display = 'none'; 
                     montage.play(); 
@@ -247,7 +227,7 @@
             }, 11000); 
         }
 
-        // --- DRAWING ECG (P-QRS-T) ---
+        // --- DRAWING ECG ---
         function drawECG() {
             if(!height) return requestAnimationFrame(drawECG);
             ctx.fillStyle = 'rgba(0, 10, 30, 0.15)'; ctx.fillRect(0, 0, width, height);
@@ -304,7 +284,7 @@
             }
         }, (state==='critical') ? 200 : 1200);
 
-        // --- VIDEO TAMAT -> TEXT -> AUTO EXIT & CLOSE SELEPAS 10 SAAT ---
+        // --- VIDEO TAMAT -> AUTO EXIT ---
         montage.addEventListener('ended', function() {
             videoScreen.style.opacity = 0;
             loginScreen.style.display = 'flex';
@@ -324,27 +304,20 @@
             amplitude = 150;
             speed = 4;
 
-            // PENUTUP SEBARIS & KECIL SEDIKIT
             contentBox.innerHTML = '<h2 class="closing-msg">KAMI SEDIA MEMBANTU</h2>';
             contentBox.style.opacity = 1;
             contentBox.style.transform = "scale(1)";
 
-            // --- AUTO EXIT & CLOSE SELEPAS 10 SAAT ---
+            // AUTO EXIT
             setTimeout(() => {
                 if (document.exitFullscreen) document.exitFullscreen();
                 else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
 
-                try {
-                    window.open('', '_self', '');
-                    window.close();
-                } catch(e) {}
+                try { window.open('', '_self', ''); window.close(); } catch(e) {}
 
-                // FALLBACK
                 document.body.style.transition = "opacity 2s";
                 document.body.style.opacity = "0";
-                setTimeout(() => {
-                    window.location.href = "about:blank"; 
-                }, 2000);
+                setTimeout(() => { window.location.href = "about:blank"; }, 2000);
             }, 10000); 
         });
     </script>
