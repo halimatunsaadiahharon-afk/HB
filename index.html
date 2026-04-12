@@ -3,323 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#000000">
-
-    <title>Perasmian Hospital Baling</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,600&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Gimik Pelancaran ICoRSSIHS 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CSS UTAMA --- */
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Montserrat', sans-serif; overflow: hidden; background: radial-gradient(circle at center, #002d5a 0%, #000812 100%); color: #fff; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-        
-        #login-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 2s ease; }
-        
-        #setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; color: #555; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
-
-        .grid-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-image: linear-gradient(rgba(0, 234, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 234, 255, 0.05) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
-        canvas#ecg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.9; }
-        
-        .medical-hud { position: absolute; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; color: #80d4ff; z-index: 2; letter-spacing: 1px; text-transform: uppercase; pointer-events: none; }
-        .top-left { top: 40px; left: 40px; border-left: 3px solid #00eaff; padding-left: 15px; }
-        .top-left h4 { margin: 0; color: #00eaff; font-size: 1.2rem; margin-bottom: 5px; font-weight: 800; }
-        .bp-reading { font-size: 1.1rem; color: #fff; font-weight: 600; letter-spacing: 1px; }
-        .bp-unit { font-size: 0.8rem; color: #80d4ff; font-weight: normal; }
-        .top-right { top: 40px; right: 40px; text-align: right; border-right: 3px solid #00eaff; padding-right: 15px; }
-        .bpm-value { font-size: 1.5rem; color: #00eaff; font-weight: bold; }
-        .status-badge { display: inline-block; margin-top: 5px; padding: 4px 12px; background: rgba(0, 234, 255, 0.1); border: 1px solid #00eaff; color: #00eaff; font-size: 0.75rem; border-radius: 4px; font-weight: 600; }
-        .bottom-left { bottom: 30px; left: 40px; font-size: 0.75rem; opacity: 0.6; }
-        .bottom-right { bottom: 30px; right: 40px; font-size: 0.75rem; opacity: 0.6; text-align: right; }
-        
-        .login-content { position: relative; z-index: 5; text-align: center; width: 90%; max-width: 700px; padding: 40px 20px; background: rgba(0, 15, 40, 0.75); backdrop-filter: blur(15px); border: 1px solid rgba(0, 234, 255, 0.2); border-radius: 20px; box-shadow: 0 30px 60px rgba(0,0,0,0.7); transition: all 1.5s ease; pointer-events: none; }
-        
-        .intro-text { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; font-size: 1.8rem; color: #00eaff; margin-bottom: 5px; letter-spacing: 1px; text-shadow: 0 0 15px rgba(0, 234, 255, 0.3); }
-        
-        h1 { color: #fff; font-family: 'Montserrat', sans-serif; text-transform: uppercase; font-weight: 800; margin: 5px 0 25px 0; line-height: 1.2; text-shadow: 0 0 20px rgba(0, 150, 255, 0.6); font-size: clamp(1.1rem, 4vw, 2.5rem); letter-spacing: 1px; white-space: nowrap; }
-        @media screen and (max-width: 450px) { h1 { white-space: normal; font-size: 1.3rem; letter-spacing: 0px; } }
-
-        .vip-section { border-top: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 15px 0; margin-bottom: 25px; }
-        .vip-label { font-size: 0.75rem; color: #ccc; margin-bottom: 8px; letter-spacing: 2px; text-transform: uppercase; }
-        .vip-name { font-family: 'Montserrat', sans-serif; font-size: 1.3rem; color: #00eaff; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; text-shadow: 0 0 10px rgba(0, 234, 255, 0.2); }
-        .vip-role { font-size: 0.9rem; color: #fff; font-weight: 300; }
-        
-        .heart-icon-container { display: flex; justify-content: center; margin: 25px auto; width: fit-content; transition: transform 0.2s; }
-        .heart-icon-svg { width: 100px; height: auto; fill: #ff3860; filter: drop-shadow(0 0 20px rgba(255, 56, 96, 0.9)); animation: heartbeat 0.4s infinite ease-in-out; }
-        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-        
-        .instruction-text { margin-top: 15px; font-size: 0.85rem; color: #ff3860; letter-spacing: 2px; opacity: 1; animation: flashText 0.5s infinite; font-weight: bold; }
-        @keyframes flashText { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-
-        #sequence-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 95%; text-align: center; z-index: 8; pointer-events: none; }
-        
-        .seq-line { font-family: 'Playfair Display', serif; font-style: italic; font-size: 2.2rem; color: #fff; text-shadow: 0 0 20px rgba(0, 234, 255, 0.8); opacity: 0; transition: opacity 1.5s ease-in-out; margin-bottom: 10px; display: block; }
-        .seq-sub { font-family: 'Montserrat', sans-serif; font-size: 1.4rem; color: #80d4ff; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0; transition: opacity 1.5s ease-in-out; display: block; margin-bottom: 30px; }
-        .seq-corp { font-family: 'Montserrat', sans-serif; font-size: 3rem; font-weight: 800; color: #ffffff; letter-spacing: 3px; text-transform: uppercase; opacity: 0; transition: opacity 1.5s ease-in-out; display: inline-block; border-top: 2px solid #00eaff; border-bottom: 2px solid #00eaff; padding: 15px 0; text-shadow: 0 0 30px rgba(0, 234, 255, 0.9); margin-top: 20px; line-height: 1.2; }
-
-        .closing-msg { 
-            font-family: 'Montserrat', sans-serif; font-weight: 800; text-transform: uppercase; font-size: 2.8rem; letter-spacing: 3px; color: #00eaff; text-shadow: 0 0 40px rgba(0, 234, 255, 0.9); margin: 0; padding: 60px 0; animation: fadeIn 2s ease; line-height: 1.1; white-space: nowrap; 
+        body, html { 
+            margin: 0; padding: 0; height: 100%; 
+            font-family: 'Montserrat', sans-serif; 
+            overflow: hidden; background: #000; color: #fff;
+            -webkit-tap-highlight-color: transparent;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        #video-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; z-index: 5; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 1s ease; }
-        video#montage-video { width: 100%; height: 100%; object-fit: cover; }
-
-        @media screen and (max-width: 768px) { 
-            .login-content { width: 90%; padding: 30px 20px; } h1 { font-size: 1.5rem; } 
-            .heart-icon-svg { width: 80px; } .seq-line { font-size: 1.3rem; } .seq-sub { font-size: 0.9rem; } .seq-corp { font-size: 1.8rem; letter-spacing: 1px; padding: 10px 0; }
-            .closing-msg { font-size: 1.5rem; letter-spacing: 1px; } 
+        #setup-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #000; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; 
         }
+        #setup-overlay img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
+
+        .fullscreen-content {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; object-fit: cover;
+        }
+
+        /* KEYPAD STYLING */
+        #keypad-container {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, #0a1a33 0%, #000 100%);
+            z-index: 100;
+        }
+
+        .display-screen {
+            width: 280px; height: 60px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #00f2fe;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem; color: #00f2fe;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        }
+
+        .keypad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            gap: 15px;
+        }
+
+        .key {
+            width: 80px; height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.5rem; font-weight: bold;
+            cursor: pointer; transition: 0.2s;
+        }
+
+        .key:active { background: #00f2fe; color: #000; transform: scale(0.9); }
+        .key.clear { color: #ff4b2b; border-color: #ff4b2b; }
+
+        /* ACCESS GRANTED ANIMATION */
+        #status-msg {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem; font-weight: 900; color: #00ff00;
+            text-shadow: 0 0 20px #00ff00;
+            display: none; z-index: 200;
+            text-align: center;
+        }
+
+        /* WORDING PERASMIAN */
+        #official-card-container { 
+            display: none; opacity: 0; transition: opacity 2s; 
+            width: 100%; height: 100%; justify-content: center; align-items: center; 
+            position: absolute; top: 0; left: 0; z-index: 300; background: #050a14;
+        }
+        
+        .official-card { background: rgba(10, 20, 38, 0.95); border-radius: 20px; padding: 30px; text-align: center; width: 85%; max-width: 1000px; border: 1px solid rgba(255,255,255,0.1); }
+        .reveal { opacity: 0; transform: translateY(20px); animation: fadeInUp 1s ease forwards; }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        .glow-text {
+            background: linear-gradient(90deg, #fff, #4facfe, #00f2fe, #ffd3a5, #fff);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: textShine 5s linear infinite; display: inline-block;
+        }
+        @keyframes textShine { to { background-position: 200% center; } }
+
+        .conf-title { font-size: clamp(0.7rem, 2vw, 1.5rem); text-transform: uppercase; letter-spacing: 2px; }
+        .main-theme-box { font-size: clamp(1.2rem, 4vw, 3.2rem); font-weight: 900; text-transform: uppercase; margin: 15px 0; }
+        .vip-name { font-size: clamp(1.1rem, 3vw, 2.2rem); font-weight: 700; margin: 5px 0; color: #fff; }
     </style>
 </head>
 <body> 
-    <div id="setup-overlay" onclick="startScene()">[ KLIK UNTUK MULA PAPARAN ]</div>
-    
-    <audio id="venti-sound" loop preload="auto"><source src="venti.mp3" type="audio/mpeg"></audio>
-    <audio id="heart-sound" loop preload="auto"><source src="heartbeat.mp3" type="audio/mpeg"></audio>
 
-    <div id="login-screen" onclick="stabilizeSystem()">
-        <div class="grid-bg"></div>
-        <canvas id="ecg-canvas"></canvas>
-
-        <div class="medical-hud top-left">
-            <h4>HOSPITAL BALING</h4>
-            <div class="bp-reading">BP: <span id="bp-val">165/110</span> <span class="bp-unit">mmHg</span></div>
-        </div>
-        <div class="medical-hud top-right">
-            <div>HR: <span id="bpm-display" class="bpm-value">150</span> <span class="bp-unit">BPM</span></div>
-            <div class="status-badge" id="status-badge" style="background:#ff3860; color:#fff;">CRITICAL ALERT</div>
-        </div>
-        <div class="medical-hud bottom-left">SECURE CONNECTION<br>ID: HB-SPEC-2026</div>
-        <div class="medical-hud bottom-right">DIAGNOSTIC MODE: ACTIVE</div>
-
-        <div id="sequence-text">
-            <span class="seq-line" id="text-line-1">"Di sinilah setiap saat membawa makna"</span>
-            <span class="seq-sub" id="text-line-2">DARI KECEMASAN... LAHIRLAH HARAPAN</span>
-            <br>
-            <span class="seq-corp" id="text-line-3">PERKHIDMATAN KEPAKARAN<br>MERENTAS SEMPADAN</span>
-        </div>
-
-        <div class="login-content">
-            <div class="intro-text">Majlis Peluncuran</div>
-            <h1>PERKHIDMATAN KEPAKARAN<br>HOSPITAL BALING</h1>
-            <div class="vip-section">
-                <div class="vip-label">DISEMPURNAKAN OLEH</div>
-                <div class="vip-name">YBHG. DATUK DR. MAHATHAR BIN ABD WAHAB</div>
-                <div class="vip-role">Ketua Pengarah Kesihatan Malaysia</div>
-            </div>
-            <div class="heart-icon-container">
-                <svg class="heart-icon-svg" id="heart-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                </svg>
-            </div>
-            <div class="instruction-text" id="instruct-text">SENTUH UNTUK STABILKAN</div>
-        </div>
+    <div id="setup-overlay" onclick="startGimmick()">
+        <img src="ppp.jpg" alt="Background">
+        <p style="position: absolute; color: white; letter-spacing: 5px; font-weight: bold; bottom: 15%;">KLIK UNTUK MULA</p>
     </div>
+    
+    <audio id="beep-sound"><source src="https://www.soundjay.com/buttons/button-16.mp3" type="audio/mpeg"></audio>
+    <audio id="success-sound"><source src="https://www.soundjay.com/buttons/button-09.mp3" type="audio/mpeg"></audio>
+    <audio id="final-sound" preload="auto"><source src="audio3.mp3" type="audio/mpeg"></audio>
 
-    <div id="video-screen">
-        <video id="montage-video" playsinline webkit-playsinline preload="auto">
-            <source src="montaj_rasmi.mp4" type="video/mp4">
-        </video>
+    <div id="main-container">
+        <video id="video-1" class="fullscreen-content" src="video1.mp4" playsinline></video>
+
+        <div id="keypad-container" class="fullscreen-content">
+            <div style="margin-bottom: 20px; letter-spacing: 3px; color: #00f2fe;">SILA MASUKKAN KOD AKSES</div>
+            <div class="display-screen" id="pin-display">****</div>
+            <div class="keypad-grid">
+                <div class="key" onclick="pressKey('1')">1</div>
+                <div class="key" onclick="pressKey('2')">2</div>
+                <div class="key" onclick="pressKey('3')">3</div>
+                <div class="key" onclick="pressKey('4')">4</div>
+                <div class="key" onclick="pressKey('5')">5</div>
+                <div class="key" onclick="pressKey('6')">6</div>
+                <div class="key" onclick="pressKey('7')">7</div>
+                <div class="key" onclick="pressKey('8')">8</div>
+                <div class="key" onclick="pressKey('9')">9</div>
+                <div class="key clear" onclick="clearPin()">C</div>
+                <div class="key" onclick="pressKey('0')">0</div>
+                <div class="key" onclick="checkPin()" style="color: #00f2fe;">OK</div>
+            </div>
+        </div>
+
+        <div id="status-msg">ACCESS GRANTED</div>
+
+        <div id="official-card-container">
+            <div class="official-card">
+                <div class="reveal" style="animation-delay: 0.5s;">
+                    <div class="conf-title">6th International Conference On</div>
+                    <div class="conf-title" style="font-weight: 700;">Radiation Safety and Security In Healthcare Services (ICoRSSIHS) 2026</div>
+                </div>
+                <div class="reveal main-theme-box" style="animation-delay: 1.5s;">
+                    <span class="glow-text">Synergizing Science, Technology<br>And Clinical Practice Through AI</span>
+                </div>
+                <div class="reveal" style="animation-delay: 2.5s;">
+                    <div style="color: #00f2fe; letter-spacing: 5px; font-size: 0.8rem;">DIRASMIKAN OLEH</div>
+                    <div class="vip-name">DR SELVANAAYAGAM SHANMUGANATHAN</div>
+                    <div style="color: #b0c4de; font-size: 0.9rem;">Pengarah Hospital Baling</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        const ventiAudio = document.getElementById('venti-sound');
-        const heartAudio = document.getElementById('heart-sound');
-        const montage = document.getElementById('montage-video');
-        const loginScreen = document.getElementById('login-screen');
-        const videoScreen = document.getElementById('video-screen');
-        const contentBox = document.querySelector('.login-content');
-        const seqLine1 = document.getElementById('text-line-1');
-        const seqLine2 = document.getElementById('text-line-2');
-        const seqLine3 = document.getElementById('text-line-3');
-        const heartSvg = document.getElementById('heart-svg');
-        const instructText = document.getElementById('instruct-text');
-        const statusBadge = document.getElementById('status-badge');
+        const video1 = document.getElementById('video-1');
+        const keypadContainer = document.getElementById('keypad-container');
+        const pinDisplay = document.getElementById('pin-display');
+        const statusMsg = document.getElementById('status-msg');
+        const cardContainer = document.getElementById('official-card-container');
+        
+        const beepSound = document.getElementById('beep-sound');
+        const successSound = document.getElementById('success-sound');
+        const finalSound = document.getElementById('final-sound');
 
-        let sceneStarted = false; 
-        let systemStabilized = false; 
+        let enteredPin = "";
+        const CORRECT_PIN = "0000"; // TUKAR KOD DI SINI
 
-        // --- PARAMETER AWAL (KRITIKAL) ---
-        let x = 0; let y = 0; 
-        let speed = 15;         
-        let amplitude = 200;    
-        let color = '#ff3860';  
-        let lineWidth = 8;     
-        let state = 'critical'; 
-
-        const canvas = document.getElementById('ecg-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height; 
-        function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; } 
-        window.addEventListener('resize', resize);
-        setTimeout(() => { resize(); y = height / 2; }, 100);
-
-        // --- FUNGSI 1: START SCENE (TEKNIKAL KLIK) ---
-        function startScene() {
+        function startGimmick() {
             document.getElementById('setup-overlay').style.display = 'none';
             
-            // 1. Play audio KRITIKAL (Volume sederhana supaya tak bingit)
-            ventiAudio.volume = 0.5; // VOLUME VENTI DITURUNKAN KE 50%
-            ventiAudio.play();
-
-            // 2. UNLOCK AUDIO KEDUA
-            // Mainkan heartbeat sekejap (volume 0) kemudian pause
-            heartAudio.volume = 0; 
-            heartAudio.play().then(() => {
-                setTimeout(() => { heartAudio.pause(); heartAudio.currentTime = 0; }, 100); 
-            }).catch(e => console.log("Audio unlock error"));
-            
-            montage.load();
-            
+            // Masuk Fullscreen
             const elem = document.documentElement;
-            if (elem.requestFullscreen) { elem.requestFullscreen().catch(err => console.log(err)); } 
-            else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); } 
-            else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
+            if (elem.requestFullscreen) { elem.requestFullscreen(); }
             
-            sceneStarted = true;
+            // Play Video 1
+            video1.style.display = 'block';
+            video1.play();
         }
 
-        // --- FUNGSI 2: VIP SENTUH (STABILKAN) ---
-        function stabilizeSystem() {
-            if (!sceneStarted || systemStabilized) return; 
-            systemStabilized = true;
+        // Apabila Video 1 Tamat, Tunjuk Keypad
+        video1.onended = () => {
+            video1.style.display = 'none';
+            keypadContainer.style.display = 'flex';
+        };
 
-            // 1. STOP Venti & PLAY Heartbeat (PASTIKAN VOLUME 100%)
-            ventiAudio.pause(); // Matikan terus venti
-            
-            heartAudio.volume = 1.0; // VOLUME HEARTBEAT MAKIMUM 100%
-            heartAudio.currentTime = 0;
-            heartAudio.play();
-
-            // 2. Ubah Visual
-            state = 'stable';
-            color = '#00eaff'; 
-            lineWidth = 6;     
-            amplitude = 150;   
-            speed = 4;         
-            
-            statusBadge.innerText = "VITALS STABILIZED";
-            statusBadge.style.background = "rgba(0, 234, 255, 0.1)";
-            statusBadge.style.color = "#00eaff";
-            
-            heartSvg.style.fill = "#00eaff";
-            heartSvg.style.animation = "heartbeat 1.2s infinite ease-in-out";
-            
-            instructText.style.display = 'none';
-            contentBox.style.transition = "opacity 1s, transform 1s";
-            contentBox.style.opacity = "0";
-            contentBox.style.transform = "scale(0.95)";
-
-            setTimeout(() => { seqLine1.style.opacity = "1"; }, 1000);
-            setTimeout(() => { seqLine2.style.opacity = "1"; }, 4000);
-            setTimeout(() => { seqLine3.style.opacity = "1"; }, 7000);
-
-            setTimeout(() => {
-                loginScreen.style.opacity = 0;
-                let fadeHeart = setInterval(() => { if(heartAudio.volume > 0.1) heartAudio.volume -= 0.1; else { clearInterval(fadeHeart); heartAudio.pause(); } }, 100);
-                setTimeout(() => { 
-                    loginScreen.style.display = 'none'; 
-                    montage.play(); 
-                }, 1500);
-            }, 11000); 
-        }
-
-        // --- DRAWING ECG ---
-        function drawECG() {
-            if(!height) return requestAnimationFrame(drawECG);
-            ctx.fillStyle = 'rgba(0, 10, 30, 0.15)'; ctx.fillRect(0, 0, width, height);
-            
-            ctx.lineWidth = lineWidth; 
-            ctx.strokeStyle = color; 
-            ctx.shadowBlur = (state === 'critical') ? 20 : 10; 
-            ctx.shadowColor = color; 
-            ctx.lineCap = 'square'; ctx.lineJoin = 'miter'; 
-            
-            ctx.beginPath(); ctx.moveTo(x, y); x += speed;
-            
-            let cycle = (state === 'stable') ? 200 : 50; 
-            let pos = x % cycle;
-            let waveY = height / 2; 
-            
-            if(state === 'stable') {
-                if (pos > 20 && pos < 40) { waveY -= amplitude * 0.1; } 
-                else if (pos > 50 && pos < 55) { waveY += amplitude * 0.1; } 
-                else if (pos >= 55 && pos < 60) { waveY -= amplitude * 1.5; } 
-                else if (pos >= 60 && pos < 65) { waveY += amplitude * 1.5; } 
-                else if (pos >= 65 && pos < 70) { waveY += amplitude * 0.3; }
-                else if (pos > 90 && pos < 120) { waveY -= amplitude * 0.2; }
-            } else {
-                if (pos > 10 && pos < 30) { waveY -= amplitude * 0.8; } 
-                else if (pos > 30 && pos < 50) { waveY += amplitude * 0.9; } 
-                else { waveY += (Math.random() - 0.5) * 30; }
+        function pressKey(num) {
+            if (enteredPin.length < 4) {
+                enteredPin += num;
+                updateDisplay();
+                beepSound.currentTime = 0;
+                beepSound.play();
             }
-            
-            ctx.lineTo(x, waveY); ctx.stroke(); y = waveY;
-            if (x > width) { x = 0; y = height / 2; }
-            requestAnimationFrame(drawECG);
         }
-        drawECG();
 
-        setInterval(() => {
-            const bpmDisplay = document.getElementById('bpm-display');
-            const bpDisplay = document.getElementById('bp-val');
-            
-            if (state === 'stable') {
-                bpmDisplay.innerText = Math.floor(Math.random() * (80 - 72) + 72);
-                let sys = Math.floor(Math.random() * (123 - 117) + 117);
-                let dia = Math.floor(Math.random() * (83 - 77) + 77);
-                bpDisplay.innerText = sys + "/" + dia;
-                bpDisplay.style.color = "#fff";
-                bpmDisplay.style.color = "#00eaff";
+        function clearPin() {
+            enteredPin = "";
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            // Menunjukkan bintang untuk privasi
+            pinDisplay.innerText = enteredPin.split('').map(() => '*').join('') || "****";
+        }
+
+        function checkPin() {
+            if (enteredPin === CORRECT_PIN) {
+                keypadContainer.style.opacity = '0.3';
+                keypadContainer.style.pointerEvents = 'none';
+                
+                successSound.play();
+                
+                // Tunjuk Access Granted
+                setTimeout(() => {
+                    statusMsg.style.display = 'block';
+                    
+                    // Selepas 3 saat, tunjuk wording
+                    setTimeout(() => {
+                        statusMsg.style.display = 'none';
+                        keypadContainer.style.display = 'none';
+                        showOfficialCard();
+                    }, 3000);
+                    
+                }, 500);
             } else {
-                bpmDisplay.innerText = Math.floor(Math.random() * (165 - 150) + 150);
-                let sys = Math.floor(Math.random() * (170 - 160) + 160);
-                let dia = Math.floor(Math.random() * (110 - 100) + 100);
-                bpDisplay.innerText = sys + "/" + dia;
-                bpDisplay.style.color = "#ff3860";
-                bpmDisplay.style.color = "#ff3860";
+                // Kod Salah
+                pinDisplay.style.color = "red";
+                pinDisplay.innerText = "ERROR";
+                setTimeout(() => {
+                    enteredPin = "";
+                    pinDisplay.style.color = "#00f2fe";
+                    updateDisplay();
+                }, 1000);
             }
-        }, (state==='critical') ? 200 : 1200);
+        }
 
-        // --- VIDEO TAMAT -> AUTO EXIT ---
-        montage.addEventListener('ended', function() {
-            videoScreen.style.opacity = 0;
-            loginScreen.style.display = 'flex';
-            
-            seqLine1.style.opacity = "0";
-            seqLine2.style.opacity = "0";
-            seqLine3.style.opacity = "0"; 
-
+        function showOfficialCard() {
+            cardContainer.style.display = 'flex';
             setTimeout(() => {
-                loginScreen.style.opacity = 1;
-                videoScreen.style.display = 'none';
+                cardContainer.style.opacity = '1';
+                finalSound.play();
             }, 100);
-
-            state = 'stable';
-            color = '#00eaff';
-            lineWidth = 6;
-            amplitude = 150;
-            speed = 4;
-
-            contentBox.innerHTML = '<h2 class="closing-msg">KAMI SEDIA MEMBANTU</h2>';
-            contentBox.style.opacity = 1;
-            contentBox.style.transform = "scale(1)";
-
-            // AUTO EXIT
-            setTimeout(() => {
-                if (document.exitFullscreen) document.exitFullscreen();
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-
-                try { window.open('', '_self', ''); window.close(); } catch(e) {}
-
-                document.body.style.transition = "opacity 2s";
-                document.body.style.opacity = "0";
-                setTimeout(() => { window.location.href = "about:blank"; }, 2000);
-            }, 10000); 
-        });
+        }
     </script>
 </body>
 </html>
